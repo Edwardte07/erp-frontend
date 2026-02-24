@@ -10,3 +10,6 @@
 - Creacion de vista register
 - Creacion de vista landing page
 
+## 3.0.0
+- Creacion de Credenciales
+- Creacion de Registro y validaciones

@@ -1,8 +1,10 @@
 <app-header></app-header>
 
+<!--Toast global -->
+<p-toast position="top-right" [life]="1000" [baseZIndex]="10000"></p-toast>
+
 <main>
-   
-   <router-outlet></router-outlet>
+  <router-outlet></router-outlet>
 </main>
 
 <app-footer></app-footer>

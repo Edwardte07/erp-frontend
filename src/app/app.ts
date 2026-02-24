@@ -4,10 +4,11 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
 import { Header } from './components/header/header';
 import { Footer } from './components/footer/footer';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToolbarModule, ButtonModule, Header, Footer],
+  imports: [RouterOutlet, ToolbarModule, ToastModule, ButtonModule, Header, Footer],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

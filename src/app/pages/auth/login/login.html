@@ -1,32 +1,47 @@
 <div class="flex align-items-center justify-content-center min-h-screen">
   <p-card header="Login" class="w-25rem">
 
-    <div class="flex flex-column gap-3">
+    <form [formGroup]="form" class="flex flex-column gap-3" (ngSubmit)="submit()">
 
       <span class="p-float-label">
-        <input pInputText id="user" />
+        <input pInputText id="user" formControlName="userOrEmail" />
         <label for="user">Usuario</label>
       </span>
 
+      <small class="p-error" *ngIf="c('userOrEmail').touched && c('userOrEmail').invalid">
+        Campo requerido
+      </small>
+
+      
       <span class="p-float-label">
-        <input pInputText type="password" id="pass" />
+        <p-password
+          inputId="pass"
+          formControlName="password"
+          [toggleMask]="true"
+          [feedback]="false">
+        </p-password>
         <label for="pass">Password</label>
       </span>
 
-      <p-button 
-        label="Entrar" 
-        icon="pi pi-check" 
+      <small class="p-error" *ngIf="c('password').touched && c('password').invalid">
+        Campo requerido
+      </small>
+
+      <p-button
+        type="submit"
+        label="Entrar"
+        icon="pi pi-check"
         severity="success"
-        routerLink="/dashboard">
+        [disabled]="form.invalid">
       </p-button>
 
-      <p-button 
+      <p-button
         label="Crear cuenta"
         severity="info"
         routerLink="/auth/register">
       </p-button>
 
-    </div>
+    </form>
 
   </p-card>
 </div>
