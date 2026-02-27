@@ -14,25 +14,25 @@
         <label for="email">Email</label>
       </span>
       <small class="p-error" *ngIf="c('email').touched && c('email').invalid">Email válido requerido</small>
-
+      <br>
       <span class="p-float-label w-full">
         <input class="w-full" pInputText id="fullname" formControlName="fullName" />
         <label for="fullname">Nombre completo</label>
       </span>
       <small class="p-error" *ngIf="c('fullName').touched && c('fullName').invalid">Requerido</small>
-
+      <br>
       <span class="p-float-label w-full">
         <input class="w-full" pInputText id="address" formControlName="address" />
         <label for="address">Dirección</label>
       </span>
       <small class="p-error" *ngIf="c('address').touched && c('address').invalid">Requerido</small>
-
+      <br>
       <span class="p-float-label w-full">
         <input class="w-full" pInputText id="phone" formControlName="phone" pKeyFilter="int" maxlength="10" />
         <label for="phone">Teléfono (10 dígitos)</label>
       </span>
       <small class="p-error" *ngIf="c('phone').touched && c('phone').invalid">Solo números, 10 dígitos</small>
-
+      <br>
       <span class="p-float-label w-full">
         <p-calendar
           class="w-full"
@@ -47,7 +47,7 @@
       <small class="p-error" *ngIf="c('birthdate').touched && c('birthdate').hasError('underage')">
         Solo mayores de edad (18+)
       </small>
-
+      <br>
       <span class="p-float-label p-input-icon-right w-full">
         <input
           class="w-full"
@@ -75,7 +75,7 @@
       <small class="p-error" *ngIf="c('password').touched && c('password').hasError('symbol')">
         Debe incluir al menos 1 símbolo: (!@#$)
       </small>
-
+      <br>
       <!-- CONFIRMAR CONTRASEÑA-->
       <span class="p-float-label p-input-icon-right w-full">
         <input
@@ -94,7 +94,7 @@
         </i>
         <label for="confirm">Confirmar contraseña</label>
       </span>
-
+      <br>
       <small class="p-error" *ngIf="form.touched && form.hasError('mismatch')">
         Las contraseñas no coinciden
       </small>

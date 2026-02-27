@@ -7,6 +7,7 @@ import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   imports: [CommonModule, RouterModule, PanelMenuModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
@@ -18,14 +19,31 @@ export class Sidebar {
       icon: 'pi pi-home',
       routerLink: ['/home'],
     },
+
     {
       label: 'Catálogos',
       icon: 'pi pi-database',
       items: [
-        // cuando crees la pantalla Divisiones, la agregas aquí
-        // { label: 'Divisiones', icon: 'pi pi-sitemap', routerLink: ['/divisiones'] },
       ],
     },
+
+    {
+      label: 'Pages',
+      icon: 'pi pi-th-large',
+      items: [
+        {
+          label: 'Group',
+          icon: 'pi pi-users',
+          routerLink: ['/group'],
+        },
+        {
+          label: 'User',
+          icon: 'pi pi-user',
+          routerLink: ['/user'],
+        }
+      ],
+    },
+
     {
       label: 'Configuración',
       icon: 'pi pi-cog',
@@ -34,5 +52,4 @@ export class Sidebar {
       ],
     },
   ];
-
 }

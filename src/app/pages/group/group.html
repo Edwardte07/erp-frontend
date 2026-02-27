@@ -1,0 +1,21 @@
+<div class="grid">
+  <div class="col-12">
+    <p-card header="Group">
+      <div class="flex align-items-center justify-content-between">
+        <div class="text-xl font-bold">Resumen</div>
+        <p-tag severity="info" [value]="'Total: ' + total"></p-tag>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="mb-2 font-semibold">Avances</div>
+      <p-progressBar [value]="avance"></p-progressBar>
+
+      <div class="mt-3">
+        <p-card header="CARD">
+          <p>Contenido estático de ejemplo para el módulo Group.</p>
+        </p-card>
+      </div>
+    </p-card>
+  </div>
+</div>

@@ -17,3 +17,7 @@
 ## 4.0.0
 - Creacion de pagina home y layout
 - Creacion de componente sidebar
+
+## 5.0.0
+- Creacion de paginas group y user 
+- Implementacion de botones y rutas en el sidebar

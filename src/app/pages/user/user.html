@@ -1,0 +1,55 @@
+<p-card header="User">
+
+  <div class="flex align-items-center gap-3 mb-3">
+    <p-avatar 
+      [label]="profile.username.charAt(0)" 
+      size="large" 
+      shape="circle">
+    </p-avatar>
+
+    <div>
+      <div class="text-xl font-bold">{{ profile.username }}</div>
+      <div class="text-sm opacity-70">{{ profile.email }}</div>
+      <div class="text-sm opacity-70">{{ profile.phone }}</div>
+      <div class="text-sm opacity-70">{{ profile.address }}</div>
+      <div class="text-sm opacity-70">{{ profile.birthdate }}</div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="grid">
+
+    <div class="col-12 md:col-6">
+      <b>Usuario:</b><br>
+      {{ profile.username }}
+    </div>
+
+    <div class="col-12 md:col-6">
+      <b>Email:</b><br>
+      {{ profile.email }}
+    </div>
+
+    <div class="col-12 md:col-6">
+      <b>Rol:</b><br>
+      {{ profile.role }}
+    </div>
+
+    <div class="col-12 md:col-6">
+      <b>Teléfono:</b><br>
+     {{profile.phone}}
+    </div>
+
+    <div class="col-12 md:col-6">
+      <b>Dirección:</b><br>
+      {{profile.address}}
+    </div>
+
+    <div class="col-12 md:col-6">
+      <b>Fecha de nacimiento:</b><br>
+     {{profile.birthdate}}
+    </div>
+
+  </div>
+
+</p-card>
