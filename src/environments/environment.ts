@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiGatewayUrl: 'http://localhost:3000'
+  production: true,
+  apiGatewayUrl: 'https://erp-api-gateway-production-37c5.up.railway.app'
 };
