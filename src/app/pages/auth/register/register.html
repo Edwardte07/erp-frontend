@@ -7,32 +7,53 @@
         <input class="w-full" pInputText id="username" formControlName="username" />
         <label for="username">Usuario</label>
       </span>
-      <small class="p-error" *ngIf="c('username').touched && c('username').invalid">Requerido</small>
+      <small class="p-error" *ngIf="c('username')?.touched && c('username')?.invalid">
+        Requerido
+      </small>
       <br>
+
       <span class="p-float-label w-full">
         <input class="w-full" pInputText id="email" formControlName="email" />
         <label for="email">Email</label>
       </span>
-      <small class="p-error" *ngIf="c('email').touched && c('email').invalid">Email válido requerido</small>
+      <small class="p-error" *ngIf="c('email')?.touched && c('email')?.invalid">
+        Email válido requerido
+      </small>
       <br>
+
       <span class="p-float-label w-full">
         <input class="w-full" pInputText id="fullname" formControlName="fullName" />
         <label for="fullname">Nombre completo</label>
       </span>
-      <small class="p-error" *ngIf="c('fullName').touched && c('fullName').invalid">Requerido</small>
+      <small class="p-error" *ngIf="c('fullName')?.touched && c('fullName')?.invalid">
+        Requerido
+      </small>
       <br>
+
       <span class="p-float-label w-full">
         <input class="w-full" pInputText id="address" formControlName="address" />
         <label for="address">Dirección</label>
       </span>
-      <small class="p-error" *ngIf="c('address').touched && c('address').invalid">Requerido</small>
+      <small class="p-error" *ngIf="c('address')?.touched && c('address')?.invalid">
+        Requerido
+      </small>
       <br>
+
       <span class="p-float-label w-full">
-        <input class="w-full" pInputText id="phone" formControlName="phone" pKeyFilter="int" maxlength="10" />
+        <input
+          class="w-full"
+          pInputText
+          id="phone"
+          formControlName="phone"
+          pKeyFilter="int"
+          maxlength="10" />
         <label for="phone">Teléfono (10 dígitos)</label>
       </span>
-      <small class="p-error" *ngIf="c('phone').touched && c('phone').invalid">Solo números, 10 dígitos</small>
+      <small class="p-error" *ngIf="c('phone')?.touched && c('phone')?.invalid">
+        Solo números, 10 dígitos
+      </small>
       <br>
+
       <span class="p-float-label w-full">
         <p-calendar
           class="w-full"
@@ -44,10 +65,14 @@
         </p-calendar>
         <label for="birthdate">Fecha de nacimiento</label>
       </span>
-      <small class="p-error" *ngIf="c('birthdate').touched && c('birthdate').hasError('underage')">
+      <small class="p-error" *ngIf="c('birthdate')?.touched && c('birthdate')?.hasError('required')">
+        Requerido
+      </small>
+      <small class="p-error" *ngIf="c('birthdate')?.touched && c('birthdate')?.hasError('underage')">
         Solo mayores de edad (18+)
       </small>
       <br>
+
       <span class="p-float-label p-input-icon-right w-full">
         <input
           class="w-full"
@@ -66,17 +91,21 @@
         <label for="password">Contraseña</label>
       </span>
 
-      <small class="p-error" *ngIf="c('password').touched && c('password').hasError('min10')">
+      <small class="p-error" *ngIf="c('password')?.touched && c('password')?.hasError('required')">
+        Requerido
+      </small>
+      <small class="p-error" *ngIf="c('password')?.touched && c('password')?.hasError('min10')">
         Mínimo 10 caracteres
       </small>
-      <small class="p-error" *ngIf="c('password').touched && c('password').hasError('max10')">
+      <small class="p-error" *ngIf="c('password')?.touched && c('password')?.hasError('max10')">
         Máximo 10 caracteres
       </small>
-      <small class="p-error" *ngIf="c('password').touched && c('password').hasError('symbol')">
+      <small class="p-error" *ngIf="c('password')?.touched && c('password')?.hasError('symbol')">
         Debe incluir al menos 1 símbolo: (!@#$)
       </small>
       <br>
-      <!-- CONFIRMAR CONTRASEÑA-->
+
+      <!-- CONFIRMAR CONTRASEÑA -->
       <span class="p-float-label p-input-icon-right w-full">
         <input
           class="w-full"
@@ -94,10 +123,13 @@
         </i>
         <label for="confirm">Confirmar contraseña</label>
       </span>
-      <br>
-      <small class="p-error" *ngIf="form.touched && form.hasError('mismatch')">
+      <small class="p-error" *ngIf="c('confirmPassword')?.touched && c('confirmPassword')?.hasError('required')">
+        Requerido
+      </small>
+      <small class="p-error" *ngIf="c('confirmPassword')?.touched && form.hasError('mismatch')">
         Las contraseñas no coinciden
       </small>
+      <br>
 
       <p-button
         class="w-full"

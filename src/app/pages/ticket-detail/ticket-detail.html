@@ -1,0 +1,70 @@
+<p-card header="Detalle de ticket" *ngIf="ticket">
+  <div class="p-fluid">
+    <div class="field">
+      <label>Título</label>
+      <input pInputText [(ngModel)]="ticket.title" />
+    </div>
+
+    <div class="field">
+      <label>Descripción</label>
+      <textarea pInputTextarea rows="5" [(ngModel)]="ticket.description"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Estado</label>
+      <p-dropdown [options]="statusOptions" [(ngModel)]="ticket.status"></p-dropdown>
+    </div>
+
+    <div class="field">
+      <label>Asignado a</label>
+      <p-dropdown
+        [options]="users"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="ticket.assignedToUserId">
+      </p-dropdown>
+    </div>
+
+    <div class="field">
+      <label>Prioridad</label>
+      <p-dropdown [options]="priorityOptions" [(ngModel)]="ticket.priority"></p-dropdown>
+    </div>
+
+    <div class="actions">
+      <p-button label="Volver" severity="secondary" (onClick)="back()"></p-button>
+      <p-button label="Guardar cambios" (onClick)="saveChanges()"></p-button>
+    </div>
+  </div>
+</p-card>
+
+<p-card header="Comentarios" *ngIf="ticket" styleClass="mt-3">
+  <div class="comment-box">
+    <textarea pInputTextarea rows="3" [(ngModel)]="newComment" placeholder="Escribe un comentario"></textarea>
+    <p-button label="Agregar comentario" (onClick)="addComment()"></p-button>
+  </div>
+
+  <div *ngIf="ticket.comments.length; else noComments">
+    <div class="comment-item" *ngFor="let comment of ticket.comments">
+      <strong>{{ comment.userName }}</strong>
+      <small>{{ comment.createdAt | date:'short' }}</small>
+      <p>{{ comment.message }}</p>
+    </div>
+  </div>
+
+  <ng-template #noComments>
+    <p>No hay comentarios.</p>
+  </ng-template>
+</p-card>
+
+<p-card header="Historial" *ngIf="ticket" styleClass="mt-3">
+  <div *ngIf="ticket.history.length; else noHistory">
+    <div class="history-item" *ngFor="let item of ticket.history">
+      <strong>{{ item.action }}</strong> - {{ item.userName }}
+      <small>{{ item.createdAt | date:'short' }}</small>
+    </div>
+  </div>
+
+  <ng-template #noHistory>
+    <p>No hay historial.</p>
+  </ng-template>
+</p-card>

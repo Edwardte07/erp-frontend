@@ -2,6 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -10,87 +12,91 @@ import { ToastModule } from 'primeng/toast';
 import { CalendarModule } from 'primeng/calendar';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { MessageService } from 'primeng/api';
-import { PasswordModule } from 'primeng/password';
 
-import { Auth } from '../../../components/services/auth';
-import { password10WithSymbol, onlyAdult, matchPass } from '../../../components/validators/simple.validators';
+import {
+  password10WithSymbol,
+  onlyAdult,
+  matchPass
+} from '../../../components/validators/simple.validators';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink,
-    CardModule,
-    InputTextModule,
-    ButtonModule,
-    ToastModule,
-    CalendarModule,
-    KeyFilterModule,
-    PasswordModule
+    CommonModule, ReactiveFormsModule, RouterLink,
+    CardModule, InputTextModule, ButtonModule,
+    ToastModule, CalendarModule, KeyFilterModule
   ],
-  providers: [],
+  providers: [MessageService],
   templateUrl: './register.html'
 })
 export class Register {
-  private fb = inject(FormBuilder);
-  private auth = inject(Auth);
+  private fb     = inject(FormBuilder);
+  private http   = inject(HttpClient);
   private router = inject(Router);
-  private msg = inject(MessageService);
+  private msg    = inject(MessageService);
 
-  
+  loading = false;
   showPassword = false;
-  showConfirm = false;
+  showConfirm  = false;
 
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
+  form = this.fb.group(
+    {
+      username:        ['', [Validators.required, Validators.minLength(3)]],
+      email:           ['', [Validators.required, Validators.email]],
+      fullName:        ['', Validators.required],
+      address:         ['', Validators.required],
+      phone:           ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      birthdate:       [null as Date | null, [Validators.required, onlyAdult]],
+      password:        ['', [Validators.required, password10WithSymbol]],
+      confirmPassword: ['', Validators.required]
+    },
+    { validators: matchPass }
+  );
 
-  toggleConfirm() {
-    this.showConfirm = !this.showConfirm;
-  }
+  togglePassword(): void { this.showPassword = !this.showPassword; }
+  toggleConfirm():  void { this.showConfirm  = !this.showConfirm; }
 
-  form = this.fb.group({
-    username: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    fullName: ['', Validators.required],
-    address: ['', Validators.required],
-    phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-    birthdate: [null, [Validators.required, onlyAdult]],
-    password: ['', [Validators.required, password10WithSymbol]],
-    confirmPassword: ['', Validators.required]
-  }, { validators: matchPass });
-
-  
-  limitTo10(controlName: string) {
+  limitTo10(controlName: string): void {
     const control = this.form.get(controlName);
     if (!control) return;
-
-    const value = (control.value ?? '') as string;
-    if (value.length > 10) {
-      control.setValue(value.slice(0, 10), { emitEvent: false });
-    }
+    const value = String(control.value ?? '');
+    if (value.length > 10) control.setValue(value.slice(0, 10), { emitEvent: false });
   }
 
-  c(name: string) {
-    return this.form.get(name)!;
-  }
+  c(name: string) { return this.form.get(name); }
 
-  submit() {
+  async submit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.msg.add({ severity: 'warn', summary: 'Validación', detail: 'Revisa los campos' });
+      this.msg.add({ severity: 'warn', summary: 'Validación', detail: 'Revisa los campos del formulario' });
       return;
     }
 
-    this.auth.register({
-      username: this.form.value.username!,
-      email: this.form.value.email!,
-      password: this.form.value.password!
-    });
+    this.loading = true;
+    const v = this.form.getRawValue();
 
-    this.msg.add({ severity: 'success', summary: 'Registro', detail: 'Cuenta creada' });
-    this.router.navigate(['/auth/login']);
+    try {
+      await firstValueFrom(
+        this.http.post(`${environment.apiGatewayUrl}/auth/register`, {
+          username:  v.username,
+          email:     v.email,
+          fullName:  v.fullName,
+          address:   v.address,
+          phone:     v.phone,
+          birthdate: v.birthdate,
+          password:  v.password
+        })
+      );
+
+      this.msg.add({ severity: 'success', summary: 'Registro', detail: 'Cuenta creada correctamente' });
+      this.form.reset();
+      this.router.navigate(['/auth/login']);
+    } catch {
+      this.msg.add({ severity: 'error', summary: 'Registro', detail: 'El usuario o correo ya existe' });
+    } finally {
+      this.loading = false;
+    }
   }
 }

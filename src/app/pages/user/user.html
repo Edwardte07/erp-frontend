@@ -1,96 +1,146 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<p-card header="Perfil de Usuario">
+<div class="page" *ngIf="currentUser">
+  <div class="profile-grid">
+    <p-card>
+      <div class="profile-header">
+        <p-avatar
+          [label]="profile.username.charAt(0).toUpperCase()"
+          size="xlarge"
+          shape="circle">
+        </p-avatar>
 
-  <div class="profile-header">
-    <p-avatar 
-      label="E" 
-      size="xlarge" 
-      shape="circle">
-    </p-avatar>
+        <div class="profile-info">
+          <h2>{{ profile.username }}</h2>
+          <p>{{ profile.email }}</p>
+          <span class="role-badge">{{ profile.role }}</span>
+        </div>
+      </div>
 
-    <div>
-      <h2>{{ profile.username }}</h2>
-      <p>{{ profile.role }}</p>
+      <p-divider></p-divider>
+
+      <div class="profile-data">
+        <p><strong>Teléfono:</strong> {{ profile.phone || 'No definido' }}</p>
+        <p><strong>Dirección:</strong> {{ profile.address || 'No definida' }}</p>
+        <p><strong>Fecha de nacimiento:</strong> {{ profile.birthdate || 'No definida' }}</p>
+      </div>
+
+      <div class="profile-actions">
+        <p-button
+          label="Editar perfil"
+          icon="pi pi-pencil"
+          severity="success"
+          (onClick)="openEdit()">
+        </p-button>
+      </div>
+    </p-card>
+
+    <p-card header="Resumen de tickets">
+      <div class="summary-list">
+        <div class="summary-item">
+          <span>Total asignados</span>
+          <strong>{{ totalAssigned }}</strong>
+        </div>
+
+        <div class="summary-item">
+          <span>Pendientes</span>
+          <strong>{{ pendingCount }}</strong>
+        </div>
+
+        <div class="summary-item">
+          <span>En progreso</span>
+          <strong>{{ inProgressCount }}</strong>
+        </div>
+
+        <div class="summary-item">
+          <span>Hechos</span>
+          <strong>{{ doneCount }}</strong>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <p-card header="Tickets asignados">
+    <div *ngIf="tickets.length > 0; else noTickets">
+      <div class="ticket-item" *ngFor="let ticket of tickets">
+        <div class="ticket-content">
+          <h4>#{{ ticket.id }} - {{ ticket.title }}</h4>
+          <p>{{ ticket.description }}</p>
+          <small>Prioridad: {{ ticket.priority }}</small>
+        </div>
+
+        <p-tag
+          [value]="ticket.status"
+          [severity]="getTagSeverity(ticket.status)">
+        </p-tag>
+      </div>
+    </div>
+
+    <ng-template #noTickets>
+      <p>No tienes tickets asignados.</p>
+    </ng-template>
+  </p-card>
+</div>
+
+<p-dialog
+  header="Editar perfil"
+  [(visible)]="editDialog"
+  [modal]="true"
+  [style]="{ width: '32rem' }">
+
+  <div class="p-fluid">
+    <div class="field">
+      <label for="username">Nombre</label>
+      <input
+        id="username"
+        pInputText
+        [(ngModel)]="profile.username" />
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        pInputText
+        [(ngModel)]="profile.email" />
+    </div>
+
+    <div class="field">
+      <label for="phone">Teléfono</label>
+      <input
+        id="phone"
+        pInputText
+        [(ngModel)]="profile.phone" />
+    </div>
+
+    <div class="field">
+      <label for="address">Dirección</label>
+      <input
+        id="address"
+        pInputText
+        [(ngModel)]="profile.address" />
+    </div>
+
+    <div class="field">
+      <label for="birthdate">Fecha de nacimiento</label>
+      <input
+        id="birthdate"
+        pInputText
+        [(ngModel)]="profile.birthdate" />
     </div>
   </div>
 
-  <p-divider></p-divider>
-
-  <div class="profile-info">
-    <p><strong>Email:</strong> {{ profile.email }}</p>
-    <p><strong>Teléfono:</strong> {{ profile.phone }}</p>
-    <p><strong>Dirección:</strong> {{ profile.address }}</p>
-    <p><strong>Fecha de nacimiento:</strong> {{ profile.birthdate }}</p>
-  </div>
-
-  <p-divider></p-divider>
-
-  <div class="actions">
-
-    <!-- EDIT -->
-    <p-button 
-      label="Editar Perfil" 
-      icon="pi pi-pencil"
-      severity="success"
-      (onClick)="openEdit()">
-    </p-button>
-
-    <!-- DELETE -->
-    <p-button 
-      label="Eliminar Cuenta" 
-      icon="pi pi-trash"
-      severity="danger"
-      (onClick)="confirmDelete()">
-    </p-button>
-
-  </div>
-
-</p-card>
-
-<!-- EDIT DIALOG -->
-<p-dialog 
-  [(visible)]="editDialog"
-  header="Editar Perfil"
-  [modal]="true"
-  [style]="{ width: '400px' }">
-
-  <div class="field">
-    <label>Nombre</label>
-    <input pInputText [(ngModel)]="tempProfile.username">
-  </div>
-
-  <div class="field">
-    <label>Email</label>
-    <input pInputText [(ngModel)]="tempProfile.email">
-  </div>
-
-  <div class="field">
-    <label>Teléfono</label>
-    <input pInputText [(ngModel)]="tempProfile.phone">
-  </div>
-
-  <div class="field">
-    <label>Dirección</label>
-    <input pInputText [(ngModel)]="tempProfile.address">
-  </div>
-
   <ng-template pTemplate="footer">
-
-      <p-button 
+    <p-button
       label="Cancelar"
       severity="secondary"
-      (onClick)="editDialog=false">
-      </p-button>
-
-    <p-button 
-      label="Guardar"
-      icon="pi pi-check"
-      severity="success"
-      (onClick)="saveProfile()">
+      (onClick)="editDialog = false">
     </p-button>
 
+    <p-button
+      label="Guardar"
+      (onClick)="saveProfile()">
+    </p-button>
   </ng-template>
-
 </p-dialog>

@@ -26,3 +26,16 @@
 - Creacion de CRUD para pages/Group
 - Implementacion de RUD en Perfil
 
+## 7.0.0
+- Creacion de Tickets
+- Recopilacion de practicas
+
+## 8.0.0
+- Creacion de Usuarios y vista
+- Implementacion de Asignacion de permisos a usuarios
+
+
+## 9.0.0
+- Creacion de Queries para login, create user, register user, update user
+- Implementacion de Asignacion de permisos a usuarios desde el sql editor
+

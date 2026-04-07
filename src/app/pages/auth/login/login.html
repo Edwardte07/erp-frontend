@@ -1,3 +1,4 @@
+<p-toast position="top-right"></p-toast>
 <div class="flex align-items-center justify-content-center min-h-screen">
   <p-card header="Login" class="w-25rem">
 
@@ -12,19 +13,24 @@
         Campo requerido
       </small>
 
-      
-      <span class="p-float-label">
-        <p-password
-          inputId="pass"
+      <span class="p-float-label" style="position: relative; display: inline-block; width: 80%;">
+        <input
+          pInputText
+          id="pass"
           formControlName="password"
-          [toggleMask]="true"
-          [feedback]="false">
-        </p-password>
+          [type]="showPassword ? 'text' : 'password'"
+          maxlength="10"
+          style="width: 100%; padding-right: 3rem; height: 2.8rem; box-sizing: border-box;" />
         <label for="pass">Password</label>
+        <i
+          [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+          (click)="showPassword = !showPassword"
+          style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6b7280; font-size: 1.1rem;">
+        </i>
       </span>
 
       <small class="p-error" *ngIf="c('password').touched && c('password').invalid">
-        Campo requerido
+        {{ c('password').hasError('required') ? 'Campo requerido' : 'Máximo 10 caracteres' }}
       </small>
 
       <p-button
@@ -32,7 +38,8 @@
         label="Entrar"
         icon="pi pi-check"
         severity="success"
-        [disabled]="form.invalid">
+        [loading]="loading"
+        [disabled]="form.invalid || loading">
       </p-button>
 
       <p-button

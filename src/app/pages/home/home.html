@@ -1,3 +1,367 @@
-<p-card header="Home">
-  <p>Bienvenido al sistema !!!</p>
-</p-card>
+<p-toast position="top-right"></p-toast>
+
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1>Home del grupo</h1>
+      <p>Tickets del grupo seleccionado</p>
+    </div>
+    <p-button
+      *ngIf="canCreateTicket()"
+      label="Crear ticket"
+      icon="pi pi-plus"
+      (onClick)="openCreateTicketModal()">
+    </p-button>
+  </div>
+
+  <div class="toolbar-grid">
+    <div class="field-box">
+      <label>Grupo</label>
+      <p-dropdown
+        [options]="myGroups"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="selectedGroupId"
+        (onChange)="onGroupChange()">
+      </p-dropdown>
+    </div>
+    <div class="field-box">
+      <label>Vista</label>
+      <p-selectButton
+        [options]="viewOptions"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="viewMode">
+      </p-selectButton>
+    </div>
+  </div>
+
+  <div class="extra-filters">
+    <div class="field-box">
+      <label>Buscar</label>
+      <input pInputText type="text" [(ngModel)]="searchText" placeholder="Título o descripción" />
+    </div>
+    <div class="field-box">
+      <label>Prioridad</label>
+      <p-dropdown
+        [options]="priorityFilterOptions"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="selectedPriority"
+        placeholder="Todas">
+      </p-dropdown>
+    </div>
+    <div class="field-box">
+      <label>Creado desde</label>
+      <input pInputText type="date" [(ngModel)]="createdFrom" />
+    </div>
+    <div class="field-box">
+      <label>Creado hasta</label>
+      <input pInputText type="date" [(ngModel)]="createdTo" />
+    </div>
+    <div class="field-box">
+      <label>&nbsp;</label>
+      <p-button
+        label="Limpiar filtros"
+        icon="pi pi-filter-slash"
+        severity="secondary"
+        (onClick)="clearExtraFilters()">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="filters-row">
+    <button class="filter-btn" [class.active]="selectedStatus === 'Todos'"       (click)="filterByStatus('Todos')">Todos</button>
+    <button class="filter-btn" [class.active]="selectedStatus === 'Pendiente'"   (click)="filterByStatus('Pendiente')">Pendiente</button>
+    <button class="filter-btn" [class.active]="selectedStatus === 'En progreso'" (click)="filterByStatus('En progreso')">En progreso</button>
+    <button class="filter-btn" [class.active]="selectedStatus === 'Hecho'"       (click)="filterByStatus('Hecho')">Hecho</button>
+    <button class="filter-btn" [class.active]="selectedStatus === 'Bloqueado'"   (click)="filterByStatus('Bloqueado')">Bloqueado</button>
+  </div>
+
+  <div class="summary-grid">
+    <p-card><div class="summary-content"><span>Total</span><strong>{{ totalTickets }}</strong></div></p-card>
+    <p-card><div class="summary-content"><span>Pendiente</span><strong>{{ pendingCount }}</strong></div></p-card>
+    <p-card><div class="summary-content"><span>En progreso</span><strong>{{ progressCount }}</strong></div></p-card>
+    <p-card><div class="summary-content"><span>Hecho</span><strong>{{ doneCount }}</strong></div></p-card>
+    <p-card><div class="summary-content"><span>Bloqueado</span><strong>{{ blockedCount }}</strong></div></p-card>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="charts-grid">
+    <p-card header="Tickets por estado">
+      <div style="height: 220px;">
+        <p-chart
+          type="doughnut"
+          [data]="chartDataEstado"
+          [options]="chartOptions"
+          height="220">
+        </p-chart>
+      </div>
+    </p-card>
+    <p-card header="Tickets por prioridad">
+      <div style="height: 220px;">
+        <p-chart
+          type="bar"
+          [data]="chartDataPrioridad"
+          [options]="chartOptions"
+          height="220">
+        </p-chart>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Vista lista -->
+  <div *ngIf="viewMode === 'lista'">
+    <p-card header="Lista de tickets">
+      <p-table
+        [value]="filteredTickets"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} tickets"
+        [sortMode]="'multiple'"
+        styleClass="p-datatable-sm p-datatable-striped">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+            <th pSortableColumn="title">Título <p-sortIcon field="title"></p-sortIcon></th>
+            <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+            <th pSortableColumn="priority">Prioridad <p-sortIcon field="priority"></p-sortIcon></th>
+            <th>Asignado a</th>
+            <th pSortableColumn="createdAt">Fecha <p-sortIcon field="createdAt"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-ticket>
+          <tr (click)="openTicketDetail(ticket)" style="cursor:pointer">
+            <td><small class="text-color-secondary">#{{ ticket.id.slice(0,8) }}</small></td>
+            <td>{{ ticket.title }}</td>
+            <td>
+              <p-tag [value]="ticket.status" [severity]="getTagSeverity(ticket.status)"></p-tag>
+            </td>
+            <td>{{ ticket.priority }}</td>
+            <td>{{ getAssignedUserName(ticket.assignedToUserId) }}</td>
+            <td><small>{{ ticket.createdAt | date:'dd/MM/yyyy' }}</small></td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center p-4">No hay tickets para mostrar.</td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- Vista kanban -->
+  <div class="kanban-grid" *ngIf="viewMode === 'kanban'">
+
+    <div class="kanban-column">
+      <p-card header="Pendiente">
+        <div class="drop-zone"
+          [class.drag-over]="draggedOverStatus === 'Pendiente'"
+          (dragover)="onDragOver($event, 'Pendiente')"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event, 'Pendiente')">
+          <div class="kanban-ticket"
+            *ngFor="let ticket of pendingTickets"
+            draggable="true"
+            (dragstart)="onDragStart($event, ticket)"
+            (click)="openTicketDetail(ticket)">
+            <h4>{{ ticket.title }}</h4>
+            <p>{{ ticket.description }}</p>
+            <small>{{ getAssignedUserName(ticket.assignedToUserId) }}</small>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="kanban-column">
+      <p-card header="En progreso">
+        <div class="drop-zone"
+          [class.drag-over]="draggedOverStatus === 'En progreso'"
+          (dragover)="onDragOver($event, 'En progreso')"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event, 'En progreso')">
+          <div class="kanban-ticket"
+            *ngFor="let ticket of progressTickets"
+            draggable="true"
+            (dragstart)="onDragStart($event, ticket)"
+            (click)="openTicketDetail(ticket)">
+            <h4>{{ ticket.title }}</h4>
+            <p>{{ ticket.description }}</p>
+            <small>{{ getAssignedUserName(ticket.assignedToUserId) }}</small>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="kanban-column">
+      <p-card header="Hecho">
+        <div class="drop-zone"
+          [class.drag-over]="draggedOverStatus === 'Hecho'"
+          (dragover)="onDragOver($event, 'Hecho')"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event, 'Hecho')">
+          <div class="kanban-ticket"
+            *ngFor="let ticket of doneTickets"
+            draggable="true"
+            (dragstart)="onDragStart($event, ticket)"
+            (click)="openTicketDetail(ticket)">
+            <h4>{{ ticket.title }}</h4>
+            <p>{{ ticket.description }}</p>
+            <small>{{ getAssignedUserName(ticket.assignedToUserId) }}</small>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="kanban-column">
+      <p-card header="Bloqueado">
+        <div class="drop-zone"
+          [class.drag-over]="draggedOverStatus === 'Bloqueado'"
+          (dragover)="onDragOver($event, 'Bloqueado')"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event, 'Bloqueado')">
+          <div class="kanban-ticket"
+            *ngFor="let ticket of blockedTickets"
+            draggable="true"
+            (dragstart)="onDragStart($event, ticket)"
+            (click)="openTicketDetail(ticket)">
+            <h4>{{ ticket.title }}</h4>
+            <p>{{ ticket.description }}</p>
+            <small>{{ getAssignedUserName(ticket.assignedToUserId) }}</small>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+  </div>
+</section>
+
+<!-- Modal: Crear ticket -->
+<p-dialog
+  header="Crear ticket"
+  [(visible)]="showCreateTicketModal"
+  [modal]="true"
+  [style]="{ width: '38rem' }">
+  <div class="p-fluid">
+    <div class="field">
+      <label>Grupo</label>
+      <p-dropdown [options]="myGroups" optionLabel="name" optionValue="id" [(ngModel)]="form.groupId" (onChange)="onGroupChange()"></p-dropdown>
+    </div>
+    <div class="field">
+      <label>Título</label>
+      <input pInputText [(ngModel)]="form.title" />
+    </div>
+    <div class="field">
+      <label>Descripción</label>
+      <textarea pInputTextarea rows="4" [(ngModel)]="form.description"></textarea>
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <p-dropdown [options]="statusOptions" [(ngModel)]="form.status"></p-dropdown>
+    </div>
+    <div class="field">
+      <label>Asignado a</label>
+      <p-dropdown [options]="groupUsers" optionLabel="name" optionValue="id" [(ngModel)]="form.assignedToUserId" placeholder="Selecciona un usuario"></p-dropdown>
+    </div>
+    <div class="field">
+      <label>Prioridad</label>
+      <p-dropdown [options]="priorityOptions" [(ngModel)]="form.priority"></p-dropdown>
+    </div>
+    <div class="field">
+      <label>Fecha límite</label>
+      <input type="date" pInputText [(ngModel)]="form.dueDate" />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" (onClick)="showCreateTicketModal = false"></p-button>
+    <p-button label="Guardar" (onClick)="saveTicket()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal: Detalle del ticket -->
+<p-dialog
+  header="Detalle del ticket"
+  [(visible)]="showDetailTicketModal"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  *ngIf="selectedTicket">
+  <div class="detail-grid">
+    <div class="detail-main">
+      <div class="p-fluid">
+        <div class="field">
+          <label>Título</label>
+          <input pInputText [(ngModel)]="selectedTicket.title" [disabled]="!canEditTicket()" />
+        </div>
+        <div class="field">
+          <label>Descripción</label>
+          <textarea pInputTextarea rows="4" [(ngModel)]="selectedTicket.description" [disabled]="!canEditTicket()"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Estado</label>
+            <p-dropdown [options]="statusOptions" [(ngModel)]="selectedTicket.status" [disabled]="!canEditTicket()"></p-dropdown>
+          </div>
+          <div class="field">
+            <label>Prioridad</label>
+            <p-dropdown [options]="priorityOptions" [(ngModel)]="selectedTicket.priority" [disabled]="!canEditTicket()"></p-dropdown>
+          </div>
+        </div>
+        <div class="field">
+          <label>Asignado a</label>
+          <p-dropdown [options]="users" optionLabel="name" optionValue="id" [(ngModel)]="selectedTicket.assignedToUserId" [disabled]="!canEditTicket()"></p-dropdown>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="comments-section">
+        <h3>Comentarios</h3>
+        <div class="comment-box" *ngIf="canCreateTicket()">
+          <textarea pInputTextarea rows="3" [(ngModel)]="newComment" placeholder="Escribe un comentario"></textarea>
+          <div class="comment-action">
+            <p-button label="Agregar comentario" icon="pi pi-comment" (onClick)="addComment()"></p-button>
+          </div>
+        </div>
+        <div *ngIf="selectedTicket.comments.length > 0; else noComments">
+          <div class="comment-item" *ngFor="let comment of selectedTicket.comments">
+            <div class="comment-head">
+              <strong>{{ comment.userName }}</strong>
+              <small>{{ comment.createdAt | date:'short' }}</small>
+            </div>
+            <p>{{ comment.message }}</p>
+          </div>
+        </div>
+        <ng-template #noComments>
+          <p class="empty-text">No hay comentarios.</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="detail-side">
+      <p-card header="Historial">
+        <div *ngIf="selectedTicket.history.length > 0; else noHistory">
+          <div class="history-item" *ngFor="let item of selectedTicket.history">
+            <strong>{{ item.action }}</strong>
+            <span>{{ item.userName }}</span>
+            <small>{{ item.createdAt | date:'short' }}</small>
+          </div>
+        </div>
+        <ng-template #noHistory>
+          <p class="empty-text">No hay historial.</p>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cerrar" severity="secondary" (onClick)="showDetailTicketModal = false"></p-button>
+    <p-button *ngIf="canEditTicket()" label="Guardar cambios" (onClick)="saveTicketDetail()"></p-button>
+  </ng-template>
+</p-dialog>

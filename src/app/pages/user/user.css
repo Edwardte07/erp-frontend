@@ -1,20 +1,88 @@
+.page {
+  padding: 1.5rem;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .profile-header {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
+.profile-info h2 {
+  margin: 0 0 0.35rem 0;
+}
+
 .profile-info p {
+  margin: 0 0 0.35rem 0;
+  color: #6b7280;
+}
+
+.role-badge {
+  display: inline-block;
+  background: #eef2ff;
+  color: #3730a3;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.profile-data p {
   margin: 0.5rem 0;
 }
 
-.actions {
+.profile-actions {
   display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+}
+
+.ticket-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ticket-item:last-child {
+  border-bottom: none;
+}
+
+.ticket-content h4 {
+  margin: 0 0 0.35rem 0;
+}
+
+.ticket-content p,
+.ticket-content small {
+  margin: 0;
+  color: #6b7280;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
   margin-bottom: 1rem;
 }

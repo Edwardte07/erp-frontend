@@ -1,0 +1,86 @@
+<p-card header="Crear ticket">
+  <div class="p-fluid">
+    <div class="field">
+      <label for="groupId">Grupo</label>
+      <p-dropdown
+        inputId="groupId"
+        [options]="groups"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="form.groupId"
+        (onChange)="onGroupChange()"
+        placeholder="Selecciona un grupo">
+      </p-dropdown>
+    </div>
+
+    <div class="field">
+      <label for="title">Título</label>
+      <input
+        id="title"
+        pInputText
+        [(ngModel)]="form.title" />
+    </div>
+
+    <div class="field">
+      <label for="description">Descripción</label>
+      <textarea
+        id="description"
+        pInputTextarea
+        rows="5"
+        [(ngModel)]="form.description">
+      </textarea>
+    </div>
+
+    <div class="field">
+      <label for="status">Estado</label>
+      <p-dropdown
+        inputId="status"
+        [options]="statusOptions"
+        [(ngModel)]="form.status">
+      </p-dropdown>
+    </div>
+
+    <div class="field">
+      <label for="assignedToUserId">Asignado a</label>
+      <p-dropdown
+        inputId="assignedToUserId"
+        [options]="groupUsers"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="form.assignedToUserId"
+        placeholder="Selecciona un usuario">
+      </p-dropdown>
+    </div>
+
+    <div class="field">
+      <label for="priority">Prioridad</label>
+      <p-dropdown
+        inputId="priority"
+        [options]="priorityOptions"
+        [(ngModel)]="form.priority">
+      </p-dropdown>
+    </div>
+
+    <div class="field">
+      <label for="dueDate">Fecha límite</label>
+      <input
+        id="dueDate"
+        type="date"
+        pInputText
+        [(ngModel)]="form.dueDate" />
+    </div>
+
+    <div class="actions">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        (onClick)="cancel()">
+      </p-button>
+
+      <p-button
+        label="Guardar"
+        (onClick)="saveTicket()">
+      </p-button>
+    </div>
+  </div>
+</p-card>

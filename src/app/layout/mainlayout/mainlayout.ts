@@ -6,7 +6,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
 
 import { Sidebar } from '../../components/sidebar/sidebar';
-import { Auth } from '../../components/services/auth';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-mainlayout',

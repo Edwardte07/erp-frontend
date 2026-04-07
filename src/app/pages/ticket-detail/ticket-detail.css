@@ -1,0 +1,32 @@
+.field {
+  margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+
+.comment-box {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+
+.comment-item,
+.history-item {
+  border-bottom: 1px solid #e5e7eb;
+  padding: .75rem 0;
+}
+
+.comment-item:last-child,
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}

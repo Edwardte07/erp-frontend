@@ -1,0 +1,180 @@
+<section class="page">
+
+  <div class="page-header">
+    <div>
+      <h1>Grupos</h1>
+      <p>CRUD de grupos y asignación de usuarios</p>
+    </div>
+    <p-button
+      *ngIf="canCreateGroups()"
+      label="Crear grupo"
+      icon="pi pi-plus"
+      (onClick)="openCreate()">
+    </p-button>
+  </div>
+
+  <p-card>
+    <p-table [value]="groups" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Miembros y permisos</th>
+          <th *ngIf="canEditGroups() || canDeleteGroups()">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-group>
+        <tr>
+          <td>{{ group.id }}</td>
+          <td>{{ group.name }}</td>
+          <td>{{ group.description }}</td>
+
+          <td>
+            <div *ngIf="getMembersOfGroup(group).length > 0; else sinMiembros">
+              <div
+                *ngFor="let member of getMembersOfGroup(group)"
+                style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span>{{ member.name }}</span>
+                <p-button
+                  *ngIf="canManagePermisos()"
+                  icon="pi pi-key"
+                  [text]="true"
+                  severity="info"
+                  (onClick)="openPermisos(group, member)">
+                </p-button>
+              </div>
+            </div>
+            <ng-template #sinMiembros>
+              <span style="color:#9ca3af; font-size:12px;">Sin usuarios</span>
+            </ng-template>
+          </td>
+
+          <td *ngIf="canEditGroups() || canDeleteGroups()">
+            <div class="table-actions">
+              <p-button
+                *ngIf="canEditGroups()"
+                icon="pi pi-pencil"
+                severity="secondary"
+                [text]="true"
+                (onClick)="openEdit(group)">
+              </p-button>
+              <p-button
+                *ngIf="canDeleteGroups()"
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                (onClick)="delete(group.id)">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+</section>
+
+<!-- Modal: Crear / Editar grupo -->
+<p-dialog
+  [header]="editMode ? 'Editar grupo' : 'Crear grupo'"
+  [(visible)]="showDialog"
+  [modal]="true"
+  [style]="{ width: '36rem' }">
+
+  <div class="p-fluid">
+    <div class="field">
+      <label>Nombre del grupo</label>
+      <input pInputText [(ngModel)]="form.name" />
+    </div>
+    <div class="field">
+      <label>Descripción</label>
+      <input pInputText [(ngModel)]="form.description" />
+    </div>
+    <div class="field">
+      <label>Asignar usuarios</label>
+      <p-multiSelect
+        [options]="users"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="form.userIds"
+        defaultLabel="Selecciona usuarios"
+        [filter]="true"
+        appendTo="body">
+      </p-multiSelect>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" (onClick)="showDialog = false"></p-button>
+    <p-button [label]="editMode ? 'Actualizar' : 'Guardar'" (onClick)="save()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal: Permisos por grupo -->
+<p-dialog
+  [header]="'Permisos de ' + permisosUsuarioNombre + ' en ' + permisosGrupoNombre"
+  [(visible)]="showPermisosDialog"
+  [modal]="true"
+  [style]="{ width: '52rem' }">
+
+  <p style="font-size:12px; color:#6b7280; margin-bottom:1rem;">
+    Estos permisos aplican solo dentro del grupo <strong>{{ permisosGrupoNombre }}</strong>.
+  </p>
+
+  <div *ngIf="!loadingPermisos; else cargandoPermisos">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+
+      <div>
+        <p style="font-size:12px; font-weight:600; color:#6b7280; margin:0 0 8px;">Sin asignar</p>
+        <div style="border:1px solid #e5e7eb; border-radius:8px; padding:8px; min-height:200px; max-height:280px; overflow-y:auto;">
+          <div
+            *ngFor="let perm of getUnassignedGroupPerms()"
+            (click)="addGroupPerm(perm)"
+            style="display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border-radius:6px; cursor:pointer; margin-bottom:4px; background:#f9fafb; border:1px solid #e5e7eb; font-size:12px; font-family:monospace;"
+            onmouseover="this.style.background='#eff6ff'; this.style.borderColor='#bfdbfe'"
+            onmouseout="this.style.background='#f9fafb'; this.style.borderColor='#e5e7eb'">
+            <span>{{ perm }}</span>
+            <i class="pi pi-plus" style="font-size:10px; color:#3b82f6;"></i>
+          </div>
+          <p *ngIf="getUnassignedGroupPerms().length === 0"
+             style="font-size:12px; color:#9ca3af; text-align:center; margin-top:1rem;">
+            Todos asignados
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <p style="font-size:12px; font-weight:600; color:#16a34a; margin:0 0 8px;">
+          Asignados ({{ permisosAsignados.length }})
+        </p>
+        <div style="border:1px solid #bbf7d0; border-radius:8px; padding:8px; min-height:200px; max-height:280px; overflow-y:auto; background:#f0fdf4;">
+          <div
+            *ngFor="let perm of permisosAsignados"
+            (click)="removeGroupPerm(perm)"
+            style="display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border-radius:6px; cursor:pointer; margin-bottom:4px; background:#dcfce7; border:1px solid #bbf7d0; font-size:12px; font-family:monospace;"
+            onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#fecaca'"
+            onmouseout="this.style.background='#dcfce7'; this.style.borderColor='#bbf7d0'">
+            <span>{{ perm }}</span>
+            <i class="pi pi-times" style="font-size:10px; color:#ef4444;"></i>
+          </div>
+          <p *ngIf="permisosAsignados.length === 0"
+             style="font-size:12px; color:#9ca3af; text-align:center; margin-top:1rem;">
+            Sin permisos
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template #cargandoPermisos>
+    <p style="text-align:center; color:#6b7280; padding:2rem;">Cargando permisos...</p>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" (onClick)="showPermisosDialog = false"></p-button>
+    <p-button label="Guardar permisos" (onClick)="savePermisos()"></p-button>
+  </ng-template>
+</p-dialog>

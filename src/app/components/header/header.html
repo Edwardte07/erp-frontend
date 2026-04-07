@@ -1,7 +1,14 @@
 <header>
   <nav>
-    <a routerLink="/">Inicio</a>
-    <a routerLink="/auth/register">Crear Cuenta</a>
-    <a routerLink="/auth/login">Inicio de Sesión</a>
+  
+    @if (!auth.isLoggedIn()) {
+      <a routerLink="/">Inicio</a>
+      <a routerLink="/auth/register">Crear Cuenta</a>
+      <a routerLink="/auth/login">Inicio de Sesión</a>
+    }
+
+    @if (auth.isLoggedIn()) {
+    <a class="logout" (click)="logout()" style="cursor: pointer;">Salir</a>
+    }
   </nav>
 </header>

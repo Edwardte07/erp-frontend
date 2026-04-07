@@ -1,0 +1,142 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1>Usuarios</h1>
+      <p>CRUD de usuarios y permisos</p>
+    </div>
+
+    <p-button
+      label="Crear usuario"
+      icon="pi pi-plus"
+      (onClick)="openCreate()">
+    </p-button>
+  </div>
+
+  <p-card>
+    <p-table [value]="users" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+         <!--  <th>Rol</th> -->
+          <th>Permisos</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <!-- <td>{{ user.role }}</td> -->
+          <td>
+            <div class="perm-list">
+              <span class="perm-chip" *ngFor="let perm of user.permissions">
+                {{ perm }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <div class="table-actions">
+              <p-button icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="openEdit(user)"></p-button>
+              <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="delete(user.id)"></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</section>
+
+<p-dialog
+  [header]="editMode ? 'Editar usuario' : 'Crear usuario'"
+  [(visible)]="showDialog"
+  [modal]="true"
+  [style]="{ width: '52rem' }">
+
+  <div class="p-fluid">
+    <div class="field">
+      <label>Nombre</label>
+      <input pInputText [(ngModel)]="form.name" />
+    </div>
+
+    <div class="field">
+      <label>Email</label>
+      <input pInputText [(ngModel)]="form.email" />
+    </div>
+
+    <div class="field" *ngIf="!editMode">
+      <label>Contraseña</label>
+      <input pInputText [(ngModel)]="form.password" type="password" />
+    </div>
+
+<!--     <div class="field">
+      <label>Rol</label>
+      <p-dropdown
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="form.role">
+      </p-dropdown>
+    </div> -->
+
+    <!-- Permisos en dos columnas -->
+    <div class="field">
+      <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Permisos</label>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+        <!-- Columna izquierda: No asignados -->
+        <div>
+          <p style="font-size: 12px; font-weight: 600; color: #6b7280; margin: 0 0 8px;">
+            Sin asignar
+          </p>
+          <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; min-height: 200px; max-height: 250px; overflow-y: auto;">
+            <div
+              *ngFor="let perm of getUnassignedPermissions()"
+              (click)="addPermission(perm)"
+              style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; background: #f9fafb; border: 1px solid #e5e7eb; font-size: 12px; font-family: monospace;"
+              onmouseover="this.style.background='#eff6ff'; this.style.borderColor='#bfdbfe'"
+              onmouseout="this.style.background='#f9fafb'; this.style.borderColor='#e5e7eb'">
+              <span>{{ perm }}</span>
+              <i class="pi pi-plus" style="font-size: 10px; color: #3b82f6;"></i>
+            </div>
+            <p *ngIf="getUnassignedPermissions().length === 0"
+               style="font-size: 12px; color: #9ca3af; text-align: center; margin-top: 1rem;">
+              Todos asignados
+            </p>
+          </div>
+        </div>
+
+        <!-- Columna derecha: Asignados -->
+        <div>
+          <p style="font-size: 12px; font-weight: 600; color: #16a34a; margin: 0 0 8px;">
+            Asignados ({{ form.permissions.length }})
+          </p>
+          <div style="border: 1px solid #bbf7d0; border-radius: 8px; padding: 8px; min-height: 200px; max-height: 250px; overflow-y: auto; background: #f0fdf4;">
+            <div
+              *ngFor="let perm of form.permissions"
+              (click)="removePermission(perm)"
+              style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; background: #dcfce7; border: 1px solid #bbf7d0; font-size: 12px; font-family: monospace;"
+              onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#fecaca'"
+              onmouseout="this.style.background='#dcfce7'; this.style.borderColor='#bbf7d0'">
+              <span>{{ perm }}</span>
+              <i class="pi pi-times" style="font-size: 10px; color: #ef4444;"></i>
+            </div>
+            <p *ngIf="form.permissions.length === 0"
+               style="font-size: 12px; color: #9ca3af; text-align: center; margin-top: 1rem;">
+              Sin permisos
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" (onClick)="showDialog=false"></p-button>
+    <p-button [label]="editMode ? 'Actualizar' : 'Guardar'" (onClick)="save()"></p-button>
+  </ng-template>
+</p-dialog>
