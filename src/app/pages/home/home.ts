@@ -166,14 +166,13 @@ export class Home implements OnInit {
     try {
       const tickets = await this.ticketService.getTicketsByGroupIds(this.currentUser.groupIds);
 
-      // Si es usuario normal, solo ver sus tickets asignados
-      if (this.currentUser.role === 'user') {
-        this.allTickets = tickets.filter(t => 
+      // Superadmin ve todos, el resto solo los asignados a él
+      if (this.currentUser.role === 'superadmin') {
+        this.allTickets = tickets;
+      } else {
+        this.allTickets = tickets.filter(t =>
           t.assignedToUserId === this.currentUser!.id
         );
-      } else {
-        // superadmin ven todos
-        this.allTickets = tickets;
       }
     } catch {
       this.msg.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los tickets' });
