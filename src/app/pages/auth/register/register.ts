@@ -85,7 +85,7 @@ export class Register {
           fullName:  v.fullName,
           address:   v.address,
           phone:     v.phone,
-          birthdate: v.birthdate,
+          birthdate: v.birthdate ? new Date(v.birthdate).toISOString().split('T')[0] : '',
           password:  v.password
         })
       );
