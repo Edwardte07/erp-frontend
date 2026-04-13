@@ -151,7 +151,6 @@ export class Home implements OnInit {
 
       if (this.myGroups.length) {
         this.selectedGroupId = this.myGroups[0].id;
-        this.form.groupId    = this.myGroups[0].id;
         this.updateGroupUsers();
       }
 
@@ -172,7 +171,6 @@ export class Home implements OnInit {
 
       const tickets = await this.ticketService.getTicketsByGroupIds(groupIds);
 
-      // Todos solo ven sus tickets asignados
       this.allTickets = tickets.filter(t =>
         t.assignedToUserId === this.currentUser!.id
       );
@@ -255,10 +253,7 @@ export class Home implements OnInit {
 
   async onGroupChange(): Promise<void> {
     this.selectedStatus         = 'Todos';
-    this.form.groupId           = this.selectedGroupId;
-    this.form.assignedToUserId  = null;
     this.selectedAssignedUserId = null;
-    this.updateGroupUsers();
   }
 
   updateGroupUsers(): void {
@@ -272,12 +267,12 @@ export class Home implements OnInit {
   openCreateTicketModal(): void {
     if (!this.canCreateTicket()) return;
     this.form = {
-      groupId: this.selectedGroupId,
+      groupId: null,
       title: '', description: '',
       status: 'Pendiente', assignedToUserId: null,
       priority: 'Media', dueDate: null
     };
-    this.updateGroupUsers();
+    this.groupUsers = [];
     this.showCreateTicketModal = true;
   }
 

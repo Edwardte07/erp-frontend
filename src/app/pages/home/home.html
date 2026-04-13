@@ -252,7 +252,14 @@
   <div class="p-fluid">
     <div class="field">
       <label>Grupo</label>
-      <p-dropdown [options]="myGroups" optionLabel="name" optionValue="id" [(ngModel)]="form.groupId" (onChange)="onGroupChange()"></p-dropdown>
+      <p-dropdown
+        [options]="myGroups"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="form.groupId"
+        (onChange)="updateGroupUsers()"
+        placeholder="Selecciona un grupo">
+      </p-dropdown>
     </div>
     <div class="field">
       <label>Título</label>
@@ -268,7 +275,13 @@
     </div>
     <div class="field">
       <label>Asignado a</label>
-      <p-dropdown [options]="groupUsers" optionLabel="name" optionValue="id" [(ngModel)]="form.assignedToUserId" placeholder="Selecciona un usuario"></p-dropdown>
+      <p-dropdown
+        [options]="groupUsers"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="form.assignedToUserId"
+        placeholder="Selecciona un usuario">
+      </p-dropdown>
     </div>
     <div class="field">
       <label>Prioridad</label>
