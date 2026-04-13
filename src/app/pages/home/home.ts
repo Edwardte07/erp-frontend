@@ -251,6 +251,18 @@ export class Home implements OnInit {
     return false;
   }
 
+  canDeleteTicket(): boolean {
+    if (!this.currentUser) return false;
+    if (this.currentUser.role === 'superadmin') return true;
+    const permisos = this.permisosService.getPermisos();
+    const tieneGlobal = permisos.some(p => p.nombre === 'ticket:delete' && p.grupo_id === null);
+    if (tieneGlobal) return true;
+    if (this.selectedGroupId) {
+      return permisos.some(p => p.nombre === 'ticket:delete' && p.grupo_id === this.selectedGroupId);
+    }
+    return false;
+  }
+
   async onGroupChange(): Promise<void> {
     this.selectedStatus         = 'Todos';
     this.selectedAssignedUserId = null;
@@ -314,6 +326,21 @@ export class Home implements OnInit {
       this.msg.add({ severity: 'success', summary: 'OK', detail: 'Ticket actualizado' });
     } catch {
       this.msg.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el ticket' });
+    }
+  }
+
+  async deleteTicket(): Promise<void> {
+    if (!this.selectedTicket || !this.currentUser) return;
+    try {
+      await this.ticketService.deleteTicket(
+        this.selectedTicket.groupId,
+        this.selectedTicket.id
+      );
+      this.showDetailTicketModal = false;
+      await this.loadTickets();
+      this.msg.add({ severity: 'success', summary: 'OK', detail: 'Ticket eliminado' });
+    } catch {
+      this.msg.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el ticket' });
     }
   }
 

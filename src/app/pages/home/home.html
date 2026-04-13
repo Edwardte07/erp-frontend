@@ -336,7 +336,7 @@
 
       <div class="comments-section">
         <h3>Comentarios</h3>
-        <div class="comment-box" *ngIf="canCreateTicket()">
+        <div class="comment-box">
           <textarea pInputTextarea rows="3" [(ngModel)]="newComment" placeholder="Escribe un comentario"></textarea>
           <div class="comment-action">
             <p-button label="Agregar comentario" icon="pi pi-comment" (onClick)="addComment()"></p-button>
@@ -374,6 +374,13 @@
   </div>
 
   <ng-template pTemplate="footer">
+    <p-button
+      *ngIf="canDeleteTicket()"
+      label="Eliminar"
+      icon="pi pi-trash"
+      severity="danger"
+      (onClick)="deleteTicket()">
+    </p-button>
     <p-button label="Cerrar" severity="secondary" (onClick)="showDetailTicketModal = false"></p-button>
     <p-button *ngIf="canEditTicket()" label="Guardar cambios" (onClick)="saveTicketDetail()"></p-button>
   </ng-template>
