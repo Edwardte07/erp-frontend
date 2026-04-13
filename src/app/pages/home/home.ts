@@ -140,7 +140,9 @@ export class Home implements OnInit {
     this.loading = true;
     try {
       const [groups, users] = await Promise.all([
-        this.groupService.getGroupsByUser(this.currentUser.id),
+        this.currentUser.role === 'superadmin'
+          ? this.groupService.getAllGroups()
+          : this.groupService.getGroupsByUser(this.currentUser.id),
         this.groupService.getAllUsers()
       ]);
 
@@ -164,16 +166,16 @@ export class Home implements OnInit {
   async loadTickets(): Promise<void> {
     if (!this.currentUser) return;
     try {
-      const tickets = await this.ticketService.getTicketsByGroupIds(this.currentUser.groupIds);
+      const groupIds = this.currentUser.role === 'superadmin'
+        ? this.myGroups.map(g => g.id)
+        : this.currentUser.groupIds;
 
-      // Superadmin ve todos, el resto solo los asignados a él
-      if (this.currentUser.role === 'superadmin') {
-        this.allTickets = tickets;
-      } else {
-        this.allTickets = tickets.filter(t =>
-          t.assignedToUserId === this.currentUser!.id
-        );
-      }
+      const tickets = await this.ticketService.getTicketsByGroupIds(groupIds);
+
+      // Todos solo ven sus tickets asignados
+      this.allTickets = tickets.filter(t =>
+        t.assignedToUserId === this.currentUser!.id
+      );
     } catch {
       this.msg.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los tickets' });
     }
